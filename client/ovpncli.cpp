@@ -543,6 +543,12 @@ class ClientState
     void trigger_async_stop_local()
     {
         async_stop_local_.stop();
+#ifdef _WIN32
+        // On Windows, also stop the io_context if owned to prevent hangs
+        // due to outstanding IOCP operations blocking io_context::run()
+        if (io_context_owned)
+            io_context_->stop();
+#endif
     }
 
     // disconnect
